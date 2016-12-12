@@ -1,65 +1,87 @@
 package org.ece.owngallery.activity;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.ece.owngallery.R;
 import org.ece.owngallery.component.PhoneMediaControl.PhotoEntry;
 import org.ece.owngallery.component.PhotoPreview;
 
+import android.app.Activity;
+import android.app.WallpaperManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Bundle;
+import android.support.v4.graphics.BitmapCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.view.Menu;
+import android.widget.Toast;
 
-public class PhotoPreviewActivity extends ActionBarActivity implements OnPageChangeListener {
+public class PhotoPreviewActivity extends Activity implements OnPageChangeListener{
 
 	private ViewPager mViewPager;
 	protected List<PhotoEntry> photos;
 	protected int current,folderPosition;
-	
+
 	protected Context context;
 	private Toolbar toolbar;
-	
+	public Button setWallpaper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_photopreview);
-		
-		
+
 		context=PhotoPreviewActivity.this;
 		toolbar = (Toolbar) findViewById(R.id.tool_bar);
 		toolbar.setTitle("");
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		//setSupportActionBar(toolbar);
+		//getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		Bundle mBundle=getIntent().getExtras();
 		folderPosition= mBundle.getInt("Key_FolderID");
 		current= mBundle.getInt("Key_ID");
-		
+
 		photos=GalleryFragment.albumsSorted.get(folderPosition).photos;
-		
+
 		mViewPager = (ViewPager) findViewById(R.id.vp_base_app);
 		mViewPager.setOnPageChangeListener(this);
 		overridePendingTransition(R.anim.activity_alpha_action_in, 0);
 		bindData();
 	}
-
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.photo_preview, menu);
+		return true;
+	}
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		return super.onPrepareOptionsMenu(menu);
+	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			onBackPressed();
-			break;
+		    case android.R.id.home:
+			    onBackPressed();
+			    break;
+			case R.id.set_wallpaper_action:
+				setWallpaper();
+				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
+
 
 	protected void bindData() {
 		mViewPager.setAdapter(mPagerAdapter);
@@ -116,5 +138,29 @@ public class PhotoPreviewActivity extends ActionBarActivity implements OnPageCha
 
 	protected void updatePercent() {
 		toolbar.setTitle((current + 1) + "/" + photos.size());
+	}
+
+	public void setWallpaper(){
+		View mView = mViewPager.getChildAt(current);
+		//Bitmap mBitmap = mViewPager.getDrawingCache();
+		Log.d("8888888888888","current="+current);
+		WallpaperManager wpm = WallpaperManager.getInstance(getApplicationContext());
+		try {
+			wpm.setBitmap(convertViewToBitmap(mView));
+		} catch (IOException e) {
+			Toast.makeText(this, "Set wallpaper failed!", Toast.LENGTH_LONG).show();
+		}
+	}
+
+	public Bitmap convertViewToBitmap(View view){
+		Log.d("8888888888888","view="+view);
+		Bitmap bitmap = Bitmap.createBitmap(view.getHeight(), view.getWidth(),
+				Bitmap.Config.ARGB_8888);
+		//利用bitmap生成画布
+		Canvas canvas = new Canvas(bitmap);
+		//把view中的内容绘制在画布上
+		view.draw(canvas);
+		Log.d("8888888888888","bitmap="+bitmap);
+		return bitmap;
 	}
 }

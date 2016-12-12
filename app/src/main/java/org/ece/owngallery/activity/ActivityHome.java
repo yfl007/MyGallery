@@ -36,6 +36,7 @@ public class ActivityHome extends FragmentActivity implements SlideMenuAdapterIn
     private SlideMenuAdapter mSlideMenuAdapter;
     private int currentPosition = 0;
     private ActionBar actionBar;
+    public static int mWallpaperValue =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class ActivityHome extends FragmentActivity implements SlideMenuAdapterIn
         setContentView(R.layout.activity_home);
         Log.d(TAG,"onCreate");
         mContext = ActivityHome.this;
+        mWallpaperValue = getIntent().getIntExtra("set_wallpaper",0);
         initializeActionBar();
         initialCalling();
 //		 actionBar = getActionBar();

@@ -274,7 +274,9 @@ public class AlbumActivity extends Activity {
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			// actionmode的菜单处理
-			MenuInflater inflater = mMenuInflater;
+			MenuInflater inflater = getMenuInflater();
+			//System.out.println("onCreateActionMode-------------mMenuInflater="+mMenuInflater);
+			//System.out.println("onCreateActionMode----------inflater="+inflater);
 			inflater.inflate(R.menu.multi_select_menu, menu);
 			if (mMultiSelectActionBarView == null) {
 				mMultiSelectActionBarView = LayoutInflater.from(mContext)
